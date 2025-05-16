@@ -39,9 +39,9 @@ public class ItemServiceImpl implements ItemService {
     private final ItemMapper itemMapper;
     private final CommentMapper commentMapper;
 
-    private record LastNextBookingPair(BookingShortDto lastBooking, BookingShortDto nextBooking) {}
+    private record lastNextBookingPair(BookingShortDto lastBooking, BookingShortDto nextBooking) {}
 
-    private Map<Long, LastNextBookingPair> getLastAndNextBookingsForItems(List<Long> itemIds, LocalDateTime now) {
+    private Map<Long, lastNextBookingPair> getLastAndNextBookingsForItems(List<Long> itemIds, LocalDateTime now) {
         if (itemIds == null || itemIds.isEmpty()) {
             return Collections.emptyMap();
         }
@@ -61,11 +61,11 @@ public class ItemServiceImpl implements ItemService {
                         Collectors.collectingAndThen(Collectors.toList(), list -> list.isEmpty() ? null : list.getFirst())
                 ));
 
-        Map<Long, LastNextBookingPair> result = new HashMap<>();
+        Map<Long, lastNextBookingPair> result = new HashMap<>();
         for (Long itemId : itemIds) {
             BookingShortDto last = lastBookingsMap.get(itemId);
             BookingShortDto next = nextBookingsMap.get(itemId);
-            result.put(itemId, new LastNextBookingPair(last, next));
+            result.put(itemId, new lastNextBookingPair(last, next));
         }
         return result;
     }
@@ -92,15 +92,13 @@ public class ItemServiceImpl implements ItemService {
 
         List<Long> itemIds = items.stream().map(Item::getId).toList();
         LocalDateTime now = LocalDateTime.now();
-        Map<Long, LastNextBookingPair> bookingInfoMap = getLastAndNextBookingsForItems(itemIds,
+        Map<Long, lastNextBookingPair> bookingInfoMap = getLastAndNextBookingsForItems(itemIds,
                 now);
-
-        log.debug("Fetched {} items with booking info for user with id {}", items.size(), userId);
 
         return items.stream().map(item -> {
             ItemWithBookingInfoDto dto = itemMapper.mapToItemWithBookingInfoDto(item);
-            LastNextBookingPair bookingPair = bookingInfoMap.getOrDefault(item.getId(),
-                    new LastNextBookingPair(null, null));
+            lastNextBookingPair bookingPair = bookingInfoMap.getOrDefault(item.getId(),
+                    new lastNextBookingPair(null, null));
             dto.setLastBooking(bookingPair.lastBooking());
             dto.setNextBooking(bookingPair.nextBooking());
             return dto;
@@ -147,8 +145,8 @@ public class ItemServiceImpl implements ItemService {
         if (item.getOwner().getId().equals(userId)) {
             log.debug("User {} is owner of item {}. Fetching booking info.", userId, itemId);
             LocalDateTime now = LocalDateTime.now();
-            Map<Long, LastNextBookingPair> bookingInfoMap = getLastAndNextBookingsForItems(Collections.singletonList(itemId), now);
-            LastNextBookingPair bookingPair = bookingInfoMap.getOrDefault(itemId, new LastNextBookingPair(null, null));
+            Map<Long, lastNextBookingPair> bookingInfoMap = getLastAndNextBookingsForItems(Collections.singletonList(itemId), now);
+            lastNextBookingPair bookingPair = bookingInfoMap.getOrDefault(itemId, new lastNextBookingPair(null, null));
             itemDto.setLastBooking(bookingPair.lastBooking());
             itemDto.setNextBooking(bookingPair.nextBooking());
         } else {
