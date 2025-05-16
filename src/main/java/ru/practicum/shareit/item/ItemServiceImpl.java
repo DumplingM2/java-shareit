@@ -39,7 +39,9 @@ public class ItemServiceImpl implements ItemService {
     private final ItemMapper itemMapper;
     private final CommentMapper commentMapper;
 
-    private record lastNextBookingPair(BookingShortDto lastBooking, BookingShortDto nextBooking) {}
+    private record lastNextBookingPair(BookingShortDto lastBooking,
+                                       BookingShortDto nextBooking) {
+    }
 
     private Map<Long, lastNextBookingPair> getLastAndNextBookingsForItems(List<Long> itemIds, LocalDateTime now) {
         if (itemIds == null || itemIds.isEmpty()) {
