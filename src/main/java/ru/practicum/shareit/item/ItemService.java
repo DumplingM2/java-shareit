@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item;
 
 import java.util.List;
+
+import org.apache.coyote.BadRequestException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemWithBookingInfoDto;
@@ -28,5 +30,5 @@ public interface ItemService {
 
     List<ItemDto> searchItems(String query, Long userId);
 
-    CommentDto saveComment(NewCommentDto comment, Long itemId, Long userId);
+    CommentDto saveComment(NewCommentDto comment, Long itemId, Long userId) throws BadRequestException;
 }

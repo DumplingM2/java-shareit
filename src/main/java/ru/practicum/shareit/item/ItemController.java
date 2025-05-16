@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -77,11 +78,15 @@ public class ItemController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{itemId}/comment")
+    @PostMapping("{itemId}/comment")
     public ResponseEntity<CommentDto> saveComment(@RequestHeader(USER_ID_HEADER) Long userId,
                                                   @PathVariable Long itemId, @RequestBody @Valid NewCommentDto newCommentDto) {
         log.info("Processing request to save a comment for item with ID: {}", itemId);
-        return ResponseEntity.created(java.net.URI.create("/items/" + itemId + "/comment"))
-                .body(itemService.saveComment(newCommentDto, itemId, userId));
+        try {
+            return ResponseEntity.created(java.net.URI.create("/items/" + itemId + "/comment"))
+                    .body(itemService.saveComment(newCommentDto, itemId, userId));
+        } catch (BadRequestException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

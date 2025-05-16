@@ -39,8 +39,10 @@ public class ItemServiceImpl implements ItemService {
     private final ItemMapper itemMapper;
     private final CommentMapper commentMapper;
 
-    private record lastNextBookingPair(BookingShortDto lastBooking,
-                                       BookingShortDto nextBooking) {
+    private record lastNextBookingPair(
+            BookingShortDto lastBooking,
+            BookingShortDto nextBooking
+    ) {
     }
 
     private Map<Long, lastNextBookingPair> getLastAndNextBookingsForItems(List<Long> itemIds, LocalDateTime now) {
@@ -96,6 +98,8 @@ public class ItemServiceImpl implements ItemService {
         LocalDateTime now = LocalDateTime.now();
         Map<Long, lastNextBookingPair> bookingInfoMap = getLastAndNextBookingsForItems(itemIds,
                 now);
+
+        log.debug("Fetched {} items with booking info for user with id {}", items.size(), userId);
 
         return items.stream().map(item -> {
             ItemWithBookingInfoDto dto = itemMapper.mapToItemWithBookingInfoDto(item);
