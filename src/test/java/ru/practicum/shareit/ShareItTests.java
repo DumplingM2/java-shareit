@@ -8,5 +8,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 class ShareItTests {
 	@Test
-	void contextLoads() {}
+	void contextLoads() {
+
+	}
 }
