@@ -1,7 +1,9 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.item;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -9,46 +11,44 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.JdbcType;
-import org.hibernate.dialect.PostgreSQLEnumJdbcType;
-import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.user.User;
 
 @Entity
-@Table(name = "bookings")
+@Table(name = "items")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Booking {
+public class Item {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "start_date", nullable = false)
-    private LocalDateTime startDate;
+    @Column(name = "name", nullable = false)
+    private String name;
 
-    @Column(name = "end_date", nullable = false)
-    private LocalDateTime endDate;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id", nullable = false)
-    private Item item;
+    @Column(name = "description", nullable = false)
+    private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "booker_id", nullable = false)
-    private User booker;
+    @JoinColumn(name = "owner_id", referencedColumnName = "id", nullable = false)
+    private User owner;
 
-    @Enumerated
-    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private BookingStatus status;
+    private ItemStatus status;
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true, fetch =
+            FetchType.LAZY)
+    private Set<Comment> comments = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {
@@ -58,8 +58,8 @@ public class Booking {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Booking booking = (Booking) o;
-        return id != null && Objects.equals(id, booking.getId());
+        Item item = (Item) o;
+        return id != null && Objects.equals(id, item.getId());
     }
 
     @Override
@@ -69,10 +69,12 @@ public class Booking {
 
     @Override
     public String toString() {
-        return "Booking{" + "id=" + id + ", start_date=" + startDate + ", end_date=" + endDate +
+        return "Item{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
                 // getId() usually doesn't initialize the proxy
-                ", itemId=" + (item != null ? item.getId() : null) +
-                // same here
-                ", bookerId=" + (booker != null ? booker.getId() : null) + ", status=" + status + '}';
+                ", ownerId=" + (owner != null ? owner.getId() : null) +
+                ", status=" + status +
+                '}';
     }
 }

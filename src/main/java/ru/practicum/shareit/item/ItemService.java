@@ -1,18 +1,34 @@
 package ru.practicum.shareit.item;
 
-import ru.practicum.shareit.item.model.Item;
-
 import java.util.List;
+
+import org.apache.coyote.BadRequestException;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemWithBookingInfoDto;
+import ru.practicum.shareit.item.dto.NewCommentDto;
+import ru.practicum.shareit.item.dto.NewItemDto;
+import ru.practicum.shareit.item.dto.UpdateItemDto;
 
 public interface ItemService {
 
-    Item addItem(Long ownerId, Item item);
+    List<ItemDto> getAllItems();
 
-    Item updateItem(Long ownerId, Long itemId, Item item);
+    List<ItemWithBookingInfoDto> getAllItemsByOwnerWithBookingInfo(Long ownerId);
 
-    Item getItem(Long userId, Long itemId);
+    ItemDto saveItem(NewItemDto item, Long userId);
 
-    List<Item> getItemsByOwner(Long ownerId);
+    ItemDto getItemById(Long id);
 
-    List<Item> searchItems(String text);
+    ItemWithBookingInfoDto getItemByIdWithBookingInfo(Long itemId, Long userId);
+
+    ItemDto update(UpdateItemDto item, Long userId, Long itemId);
+
+    List<ItemDto> getItemsByUserId(Long userId);
+
+    void delete(Long id, Long userId);
+
+    List<ItemDto> searchItems(String query, Long userId);
+
+    CommentDto saveComment(NewCommentDto comment, Long itemId, Long userId) throws BadRequestException;
 }
