@@ -4,14 +4,16 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.EmailAlreadyExistsException;
-import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.NewUserDto;
 import ru.practicum.shareit.user.dto.UpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 @Slf4j
 @SuppressWarnings("unused")
@@ -21,6 +23,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserDto> getAllUsers() {
         List<UserDto> users = userRepository.findAll().stream().map(userMapper::mapToDto).toList();
         log.debug("Fetched {} users", users.size());
@@ -41,10 +44,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserDto getById(Long id) {
         return userMapper.mapToDto(userRepository.findById(id).orElseThrow(() -> {
             log.warn("User with id {} not found", id);
-            return new UserNotFoundException("User with id " + id + " not found");
+            return new NotFoundException("User with id " + id + " not found");
         }));
     }
 
@@ -52,7 +56,7 @@ public class UserServiceImpl implements UserService {
     public UserDto update(UpdateUserDto updatedUserDto, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> {
             log.warn("User with id {} not found for update", userId);
-            return new UserNotFoundException("User with id " + userId + " not found");
+            return new NotFoundException("User with id " + userId + " not found");
         });
         if (updatedUserDto.getEmail() != null && !updatedUserDto.getEmail().equals(user.getEmail())
                 && userRepository.existsByEmail(updatedUserDto.getEmail())) {

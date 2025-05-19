@@ -18,6 +18,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import ru.practicum.shareit.user.User;
+import org.hibernate.Hibernate;
 
 @Entity
 @Table(name = "comments")
@@ -48,8 +49,9 @@ public class Comment {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
+            return false;
+        }
         Comment comment = (Comment) o;
         return id != null && Objects.equals(id, comment.id);
     }

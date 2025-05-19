@@ -13,13 +13,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @SuppressWarnings("unused")
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({UserNotFoundException.class, ItemNotFoundException.class, BookingNotFoundException.class})
-    public ResponseEntity<ErrorMessage> handleNotFound(final RuntimeException e) {
-        log.warn("Encountered {} while processing request: returning 404 Not Found",
-                e.getClass().getSimpleName());
-        return ResponseEntity.status(404).body(new ErrorMessage(e.getMessage(), 404));
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorMessage> handleNotFound(NotFoundException e) {
+                log.warn("Encountered {} while processing request: returning 404 Not Found",
+                                 e.getClass().getSimpleName());
+                return ResponseEntity.status(404).body(new ErrorMessage(e.getMessage(), 404));
     }
-
     @ExceptionHandler({EmailAlreadyExistsException.class})
     public ResponseEntity<ErrorMessage> handleEmailAlreadyExists(final RuntimeException e) {
         log.warn("Encountered {} while processing request: returning 409 Conflict",

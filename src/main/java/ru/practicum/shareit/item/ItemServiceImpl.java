@@ -13,8 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.exception.AccessDeniedException;
-import ru.practicum.shareit.exception.ItemNotFoundException;
-import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.CommentMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -27,6 +26,7 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 @Slf4j
 @SuppressWarnings("unused")
@@ -75,6 +75,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemDto> getAllItems() {
         List<ItemDto> items = itemRepository.findAll().stream().map(itemMapper::mapToDto).toList();
         log.debug("Fetched {} items", items.size());
@@ -86,7 +87,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemWithBookingInfoDto> getAllItemsByOwnerWithBookingInfo(Long userId) {
         if (userRepository.findById(userId).isEmpty()) {
             log.warn("User with id {} not found", userId);
-            throw new UserNotFoundException("User with id " + userId + " not found");
+            throw new NotFoundException("User with id " + userId + " not found");
         }
 
         List<Item> items = itemRepository.findByOwnerId(userId);
@@ -116,7 +117,7 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemMapper.mapToItem(newItemDto);
         item.setOwner(userRepository.findById(userId).orElseThrow(() -> {
             log.warn("User with id {} not found", userId);
-            return new UserNotFoundException(
+            return new NotFoundException(
                     "User with id " + userId + " not found");
         }));
         Item savedItem = itemRepository.save(item);
@@ -125,10 +126,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ItemDto getItemById(Long id) {
         return itemMapper.mapToDto(itemRepository.findById(id).orElseThrow(() -> {
             log.warn("Item with id {} not found", id);
-            return new ItemNotFoundException(
+            return new NotFoundException(
                     "Item with id " + id + " not found");
         }));
     }
@@ -138,12 +140,12 @@ public class ItemServiceImpl implements ItemService {
     public ItemWithBookingInfoDto getItemByIdWithBookingInfo(Long itemId, Long userId) {
         if (userRepository.findById(userId).isEmpty()) {
             log.warn("User with id {} not found", userId);
-            throw new UserNotFoundException(
+            throw new NotFoundException(
                     "User with id " + userId + " not found");
         }
         Item item = itemRepository.findById(itemId).orElseThrow(() -> {
             log.warn("Item with id {} not found when requested by user {}", itemId, userId);
-            return new ItemNotFoundException("Item with id " + itemId + " not found");
+            return new NotFoundException("Item with id " + itemId + " not found");
         });
 
         ItemWithBookingInfoDto itemDto = itemMapper.mapToItemWithBookingInfoDto(item);
@@ -165,7 +167,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto update(UpdateItemDto updateItemDto, Long userId, Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(() -> {
             log.warn("Item with id {} not found for update", itemId);
-            return new ItemNotFoundException(
+            return new NotFoundException(
                     "Item with id " + itemId + " not found");
         });
         if (!item.getOwner().getId().equals(userId)) {
@@ -180,10 +182,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemDto> getItemsByUserId(Long userId) {
         if (userRepository.findById(userId).isEmpty()) {
             log.warn("User with id {} not found", userId);
-            throw new UserNotFoundException(
+            throw new NotFoundException(
                     "User with id " + userId + " not found");
         }
         List<ItemDto> items = itemRepository.findByOwnerId(userId).stream().map(itemMapper::mapToDto)
@@ -196,12 +199,12 @@ public class ItemServiceImpl implements ItemService {
     public void delete(Long id, Long userId) {
         if (userRepository.findById(userId).isEmpty()) {
             log.warn("User with id {} not found", userId);
-            throw new UserNotFoundException(
+            throw new NotFoundException(
                     "User with id " + userId + " not found");
         }
         Item item = itemRepository.findById(id).orElseThrow(() -> {
             log.warn("Item with id {} not found for delete", id);
-            return new ItemNotFoundException(
+            return new NotFoundException(
                     "Item with id " + id + " not found");
         });
         if (!item.getOwner().getId().equals(userId)) {
@@ -214,10 +217,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemDto> searchItems(String query, Long userId) {
         if (userRepository.findById(userId).isEmpty()) {
             log.warn("User with id {} not found", userId);
-            throw new UserNotFoundException(
+            throw new NotFoundException(
                     "User with id " + userId + " not found");
         }
         if (query.isBlank()) {
@@ -235,12 +239,12 @@ public class ItemServiceImpl implements ItemService {
     public CommentDto saveComment(NewCommentDto newCommentDto, Long itemId, Long userId) {
         User author = userRepository.findById(userId).orElseThrow(() -> {
             log.warn("User with id {} not found", userId);
-            return new UserNotFoundException(
+            return new NotFoundException(
                     "User with id " + userId + " not found");
         });
         Item item = itemRepository.findById(itemId).orElseThrow(() -> {
             log.warn("Item with id {} not found", itemId);
-            return new ItemNotFoundException(
+            return new NotFoundException(
                     "Item with id " + itemId + " not found");
         });
         List<BookingShortDto> bookings = bookingRepository.findPastAndCurrentApprovedBookingsShortForItems(

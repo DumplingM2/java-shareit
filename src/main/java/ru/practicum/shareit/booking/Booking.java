@@ -19,6 +19,7 @@ import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.user.User;
+import org.hibernate.Hibernate;
 
 @Entity
 @Table(name = "bookings")
@@ -55,12 +56,12 @@ public class Booking {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
+            if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
+                return false;
+            }
+            Booking booking = (Booking) o;
+            return id != null && Objects.equals(id, booking.getId());
         }
-        Booking booking = (Booking) o;
-        return id != null && Objects.equals(id, booking.getId());
-    }
 
     @Override
     public int hashCode() {

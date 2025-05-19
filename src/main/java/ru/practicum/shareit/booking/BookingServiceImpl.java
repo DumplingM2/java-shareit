@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -14,15 +15,14 @@ import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.dto.NewBookingDto;
 import ru.practicum.shareit.exception.AccessDeniedException;
 import ru.practicum.shareit.exception.BookingBadRequestException;
-import ru.practicum.shareit.exception.BookingNotFoundException;
-import ru.practicum.shareit.exception.ItemNotFoundException;
-import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.ItemStatus;
 import ru.practicum.shareit.user.UserRepository;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 @Slf4j
 @SuppressWarnings("unused")
@@ -34,6 +34,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingMapper bookingMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookingDto> getAllBookings() {
         List<BookingDto> bookings = bookingRepository.findAll().stream()
                 .map(bookingMapper::mapToDto).toList();
@@ -45,12 +46,12 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto saveBooking(NewBookingDto booking, Long userId) {
         if (userRepository.findById(userId).isEmpty()) {
             log.warn("User with id {} not found", userId);
-            throw new UserNotFoundException(
+            throw new NotFoundException(
                     "User with id " + userId + " not found");
         }
         Item item = itemRepository.findById(booking.getItemId()).orElseThrow(() -> {
             log.warn("Item with id {} not found", booking.getItemId());
-            return new ItemNotFoundException(
+            return new NotFoundException(
                     "Item with id " + booking.getItemId() + " not found");
         });
         if (item.getOwner().getId().equals(userId)) {
@@ -81,14 +82,15 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BookingDto getById(Long userId, Long id) {
         if (userRepository.findById(userId).isEmpty()) {
             log.warn("User with id {} not found", userId);
-            throw new UserNotFoundException("User with id " + userId + " not found");
+            throw new NotFoundException("User with id " + userId + " not found");
         }
         Booking booking = bookingRepository.findById(id).orElseThrow(() -> {
             log.warn("Booking with id {} not found", id);
-            return new BookingNotFoundException("Booking with id " + id + " not found");
+            return new NotFoundException("Booking with id " + id + " not found");
         });
         if (!booking.getBooker().getId().equals(userId) && !booking.getItem().getOwner().getId().equals(userId)) {
             log.warn("User with id {} is not the booker or owner of booking with id {}", userId, id);
@@ -102,7 +104,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto approveBooking(Long bookingId, Long userId, Boolean approved) {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> {
             log.warn("Booking with id {} not found for {}", bookingId, approved ? "approval" : "rejection");
-            return new BookingNotFoundException("Booking with id " + bookingId + " not found");
+            return new NotFoundException("Booking with id " + bookingId + " not found");
         });
         if (!booking.getItem().getOwner().getId().equals(userId)) {
             log.warn("User with id {} is not the owner of item in booking with id {}",
@@ -121,12 +123,12 @@ public class BookingServiceImpl implements BookingService {
     public void delete(Long id, Long userId) {
         if (userRepository.findById(userId).isEmpty()) {
             log.warn("User with id {} not found", userId);
-            throw new UserNotFoundException(
+            throw new NotFoundException(
                     "User with id " + userId + " not found");
         }
         Booking booking = bookingRepository.findById(id).orElseThrow(() -> {
             log.warn("Booking with id {} not found for deletion", id);
-            return new BookingNotFoundException("Booking with id " + id + " not found");
+            return new NotFoundException("Booking with id " + id + " not found");
         });
         if (!booking.getBooker().getId().equals(userId)) {
             log.warn("Booking with id {} does not belong to user with id {}", id, userId);
@@ -138,10 +140,11 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookingDto> getBookingsByBooker(Long bookerId, BookingState state, Integer from, Integer size) {
         if (userRepository.findById(bookerId).isEmpty()) {
             log.warn("User with id {} not found", bookerId);
-            throw new UserNotFoundException(
+            throw new NotFoundException(
                     "User with id " + bookerId + " not found");
         }
         Pageable pageable = getPageableWithDefaultSort(from, size);
@@ -152,10 +155,11 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookingDto> getBookingsByOwner(Long ownerId, BookingState state, Integer from, Integer size) {
         if (userRepository.findById(ownerId).isEmpty()) {
             log.warn("User with id {} not found", ownerId);
-            throw new UserNotFoundException(
+            throw new NotFoundException(
                     "User with id " + ownerId + " not found");
         }
         Pageable pageable = getPageableWithDefaultSort(from, size);
