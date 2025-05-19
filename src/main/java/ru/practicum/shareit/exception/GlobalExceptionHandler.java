@@ -19,6 +19,7 @@ public class GlobalExceptionHandler {
                                  e.getClass().getSimpleName());
                 return ResponseEntity.status(404).body(new ErrorMessage(e.getMessage(), 404));
     }
+
     @ExceptionHandler({EmailAlreadyExistsException.class})
     public ResponseEntity<ErrorMessage> handleEmailAlreadyExists(final RuntimeException e) {
         log.warn("Encountered {} while processing request: returning 409 Conflict",
