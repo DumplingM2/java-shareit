@@ -32,7 +32,7 @@ import ru.practicum.shareit.common.dto.item.ItemShortDto;
 import ru.practicum.shareit.common.dto.request.ItemRequestDto;
 import ru.practicum.shareit.common.dto.request.NewItemRequestDto;
 import ru.practicum.shareit.server.exception.ItemRequestNotFoundException;
-import ru.practicum.shareit.server.exception.UserNotFoundException;
+import ru.practicum.shareit.server.exception.NotFoundException;
 
 
 @WebMvcTest(ItemRequestController.class)
@@ -102,7 +102,7 @@ class ItemRequestControllerTest {
     void addRequest_whenUserNotFound_shouldReturnNotFound() throws Exception {
         String errorMsg = "User not found";
         when(itemRequestService.addRequest(any(NewItemRequestDto.class), eq(nonExistentUserId)))
-                .thenThrow(new UserNotFoundException(errorMsg));
+                .thenThrow(new NotFoundException(errorMsg));
 
         mockMvc.perform(post("/requests")
                         .header(userIdHeaderName, nonExistentUserId)
@@ -152,7 +152,7 @@ class ItemRequestControllerTest {
     void getOwnRequests_whenUserNotFound_shouldReturnNotFound() throws Exception {
         String errorMsg = "User not found";
         when(itemRequestService.getOwnRequests(nonExistentUserId))
-                .thenThrow(new UserNotFoundException(errorMsg));
+                .thenThrow(new NotFoundException(errorMsg));
 
         mockMvc.perform(get("/requests")
                         .header(userIdHeaderName, nonExistentUserId))
@@ -206,7 +206,7 @@ class ItemRequestControllerTest {
     void getAllRequests_whenUserNotFound_shouldReturnNotFound() throws Exception {
         String errorMsg = "User not found";
         when(itemRequestService.getAllRequests(eq(nonExistentUserId), any(), any()))
-                .thenThrow(new UserNotFoundException(errorMsg));
+                .thenThrow(new NotFoundException(errorMsg));
 
         mockMvc.perform(get("/requests/all")
                         .header(userIdHeaderName, nonExistentUserId))
@@ -258,7 +258,7 @@ class ItemRequestControllerTest {
     void getRequestById_whenUserNotFound_shouldReturnNotFound() throws Exception {
         String errorMsg = "Requesting user not found";
         when(itemRequestService.getRequestById(eq(request1Id), eq(nonExistentUserId)))
-                .thenThrow(new UserNotFoundException(errorMsg));
+                .thenThrow(new NotFoundException(errorMsg));
 
         mockMvc.perform(get("/requests/{requestId}", request1Id)
                         .header(userIdHeaderName, nonExistentUserId))

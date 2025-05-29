@@ -33,7 +33,7 @@ import ru.practicum.shareit.common.dto.user.NewUserDto;
 import ru.practicum.shareit.common.dto.user.UpdateUserDto;
 import ru.practicum.shareit.common.dto.user.UserDto;
 import ru.practicum.shareit.server.exception.EmailAlreadyExistsException;
-import ru.practicum.shareit.server.exception.UserNotFoundException;
+import ru.practicum.shareit.server.exception.NotFoundException;
 
 
 @WebMvcTest(UserController.class)
@@ -156,7 +156,7 @@ class UserControllerTest {
     void getById_whenUserNotFound_shouldReturnNotFound() throws Exception {
         String errorMessage = "User not found!";
         when(userService.getById(nonExistentUserId))
-                .thenThrow(new UserNotFoundException(errorMessage));
+                .thenThrow(new NotFoundException(errorMessage));
 
         mockMvc.perform(get("/users/{id}", nonExistentUserId))
                 .andExpect(status().isNotFound())
@@ -192,7 +192,7 @@ class UserControllerTest {
     void update_whenUserNotFound_shouldReturnNotFound() throws Exception {
         String errorMessage = "Cannot update non-existent user";
         when(userService.update(any(UpdateUserDto.class), eq(nonExistentUserId)))
-                .thenThrow(new UserNotFoundException(errorMessage));
+                .thenThrow(new NotFoundException(errorMessage));
 
         mockMvc.perform(patch("/users/{id}", nonExistentUserId)
                         .contentType(MediaType.APPLICATION_JSON)

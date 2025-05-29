@@ -30,7 +30,7 @@ import ru.practicum.shareit.common.dto.user.NewUserDto;
 import ru.practicum.shareit.common.dto.user.UpdateUserDto;
 import ru.practicum.shareit.common.dto.user.UserDto;
 import ru.practicum.shareit.server.exception.EmailAlreadyExistsException;
-import ru.practicum.shareit.server.exception.UserNotFoundException;
+import ru.practicum.shareit.server.exception.NotFoundException;
 import ru.practicum.shareit.server.user.mapper.UserMapper;
 
 @ExtendWith(MockitoExtension.class)
@@ -175,13 +175,13 @@ class UserServiceImplTest {
     }
 
     @Test
-    @DisplayName("getById should throw UserNotFoundException when user does not exist")
+    @DisplayName("getById should throw NotFoundException when user does not exist")
     void getById_whenUserDoesNotExist_shouldThrowUserNotFoundException() {
         Long userId = 99L;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
-        UserNotFoundException exception = assertThrows(UserNotFoundException.class,
+        NotFoundException exception = assertThrows(NotFoundException.class,
                 () -> userService.getById(userId),
-                "Should throw UserNotFoundException when user is not found");
+                "Should throw NotFoundException when user is not found");
 
         assertThat("Exception message should contain 'not found'", exception.getMessage(),
                 containsString("not found"));
@@ -310,13 +310,13 @@ class UserServiceImplTest {
     }
 
     @Test
-    @DisplayName("update should throw UserNotFoundException when user does not exist")
+    @DisplayName("update should throw NotFoundException when user does not exist")
     void update_whenUserDoesNotExist_shouldThrowUserNotFoundException() {
         Long userId = 99L;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
-        UserNotFoundException exception = assertThrows(UserNotFoundException.class,
+        NotFoundException exception = assertThrows(NotFoundException.class,
                 () -> userService.update(updateUserDto, userId),
-                "Should throw UserNotFoundException when user is not found");
+                "Should throw NotFoundException when user is not found");
 
         assertThat("Exception message should contain 'not found'", exception.getMessage(),
                 containsString("not found"));

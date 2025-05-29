@@ -43,11 +43,7 @@ import ru.practicum.shareit.common.dto.booking.NewBookingDto;
 import ru.practicum.shareit.common.enums.BookingState;
 import ru.practicum.shareit.common.enums.BookingStatus;
 import ru.practicum.shareit.server.booking.mapper.BookingMapper;
-import ru.practicum.shareit.server.exception.AccessDeniedException;
-import ru.practicum.shareit.server.exception.BookingBadRequestException;
-import ru.practicum.shareit.server.exception.BookingNotFoundException;
-import ru.practicum.shareit.server.exception.ItemNotFoundException;
-import ru.practicum.shareit.server.exception.UserNotFoundException;
+import ru.practicum.shareit.server.exception.*;
 import ru.practicum.shareit.server.item.Item;
 import ru.practicum.shareit.server.item.ItemRepository;
 import ru.practicum.shareit.server.user.User;
@@ -241,28 +237,28 @@ class BookingServiceImplTest {
         }
 
         @Test
-        @DisplayName("should throw UserNotFoundException when booker not found")
+        @DisplayName("should throw NotFoundException when booker not found")
         void saveBooking_whenBookerNotFound_shouldThrowUserNotFoundException() {
             when(userRepository.findById(bookerId)).thenReturn(Optional.empty());
 
-            assertThrows(UserNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> bookingService.saveBooking(newBookingDtoValid, bookerId),
-                    "Should throw UserNotFoundException when booker ID does not exist");
+                    "Should throw NotFoundException when booker ID does not exist");
 
             verify(userRepository).findById(bookerId);
             verifyNoInteractions(itemRepository, bookingMapper, bookingRepository);
         }
 
         @Test
-        @DisplayName("should throw ItemNotFoundException when item not found")
+        @DisplayName("should throw NotFoundException when item not found")
         void saveBooking_whenItemNotFound_shouldThrowItemNotFoundException() {
             when(userRepository.findById(bookerId)).thenReturn(Optional.of(booker));
             when(itemRepository.findById(newBookingDtoValid.getItemId())).thenReturn(
                     Optional.empty());
 
-            assertThrows(ItemNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> bookingService.saveBooking(newBookingDtoValid, bookerId),
-                    "Should throw ItemNotFoundException when item ID does not exist");
+                    "Should throw NotFoundException when item ID does not exist");
 
             verify(userRepository).findById(bookerId);
             verify(itemRepository).findById(itemAvailableId);
@@ -379,27 +375,27 @@ class BookingServiceImplTest {
         }
 
         @Test
-        @DisplayName("should throw UserNotFoundException when requesting user not found")
+        @DisplayName("should throw NotFoundException when requesting user not found")
         void getById_whenUserNotFound_shouldThrowUserNotFoundException() {
             when(userRepository.findById(bookerId)).thenReturn(Optional.empty());
 
-            assertThrows(UserNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> bookingService.getById(bookerId, bookingWaitingId),
-                    "Should throw UserNotFoundException when requesting user is not found");
+                    "Should throw NotFoundException when requesting user is not found");
 
             verify(userRepository).findById(bookerId);
             verifyNoInteractions(bookingRepository, bookingMapper);
         }
 
         @Test
-        @DisplayName("should throw BookingNotFoundException when booking not found")
+        @DisplayName("should throw NotFoundException when booking not found")
         void getById_whenBookingNotFound_shouldThrowBookingNotFoundException() {
             when(userRepository.findById(bookerId)).thenReturn(Optional.of(booker));
             when(bookingRepository.findById(bookingWaitingId)).thenReturn(Optional.empty());
 
-            assertThrows(BookingNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> bookingService.getById(bookerId, bookingWaitingId),
-                    "Should throw BookingNotFoundException when booking is not found");
+                    "Should throw NotFoundException when booking is not found");
 
             verify(userRepository).findById(bookerId);
             verify(bookingRepository).findById(bookingWaitingId);
@@ -471,13 +467,13 @@ class BookingServiceImplTest {
         }
 
         @Test
-        @DisplayName("should throw BookingNotFoundException when booking not found")
+        @DisplayName("should throw NotFoundException when booking not found")
         void approveBooking_whenBookingNotFound_shouldThrowBookingNotFoundException() {
             when(bookingRepository.findById(bookingWaitingId)).thenReturn(Optional.empty());
 
-            assertThrows(BookingNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> bookingService.approveBooking(bookingWaitingId, ownerId, true),
-                    "Should throw BookingNotFoundException when booking is not found");
+                    "Should throw NotFoundException when booking is not found");
 
             verify(bookingRepository).findById(bookingWaitingId);
             verifyNoInteractions(bookingMapper);
@@ -520,27 +516,27 @@ class BookingServiceImplTest {
         }
 
         @Test
-        @DisplayName("should throw UserNotFoundException when user not found")
+        @DisplayName("should throw NotFoundException when user not found")
         void delete_whenUserNotFound_shouldThrowUserNotFoundException() {
             when(userRepository.findById(bookerId)).thenReturn(Optional.empty());
 
-            assertThrows(UserNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> bookingService.delete(bookingWaitingId, bookerId),
-                    "Should throw UserNotFoundException when user is not found");
+                    "Should throw NotFoundException when user is not found");
 
             verify(userRepository).findById(bookerId);
             verifyNoInteractions(bookingRepository);
         }
 
         @Test
-        @DisplayName("should throw BookingNotFoundException when booking not found")
+        @DisplayName("should throw NotFoundException when booking not found")
         void delete_whenBookingNotFound_shouldThrowBookingNotFoundException() {
             when(userRepository.findById(bookerId)).thenReturn(Optional.of(booker));
             when(bookingRepository.findById(bookingWaitingId)).thenReturn(Optional.empty());
 
-            assertThrows(BookingNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> bookingService.delete(bookingWaitingId, bookerId),
-                    "Should throw BookingNotFoundException when booking is not found");
+                    "Should throw NotFoundException when booking is not found");
 
             verify(userRepository).findById(bookerId);
             verify(bookingRepository).findById(bookingWaitingId);
@@ -658,22 +654,22 @@ class BookingServiceImplTest {
         }
 
         @Test
-        @DisplayName("getBookingsByBooker should throw UserNotFoundException")
+        @DisplayName("getBookingsByBooker should throw NotFoundException")
         void getBookingsByBooker_whenUserNotFound_shouldThrowUserNotFoundException() {
             when(userRepository.findById(bookerId)).thenReturn(Optional.empty());
-            assertThrows(UserNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> bookingService.getBookingsByBooker(bookerId, BookingState.ALL, from, size),
-                    "Should throw UserNotFoundException when booker is not found");
+                    "Should throw NotFoundException when booker is not found");
             verifyNoInteractions(bookingRepository, bookingMapper);
         }
 
         @Test
-        @DisplayName("getBookingsByOwner should throw UserNotFoundException")
+        @DisplayName("getBookingsByOwner should throw NotFoundException")
         void getBookingsByOwner_whenUserNotFound_shouldThrowUserNotFoundException() {
             when(userRepository.findById(ownerId)).thenReturn(Optional.empty());
-            assertThrows(UserNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> bookingService.getBookingsByOwner(ownerId, BookingState.ALL, from, size),
-                    "Should throw UserNotFoundException when owner is not found");
+                    "Should throw NotFoundException when owner is not found");
             verifyNoInteractions(bookingRepository, bookingMapper);
         }
 

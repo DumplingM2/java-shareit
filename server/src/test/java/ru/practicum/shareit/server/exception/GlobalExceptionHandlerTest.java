@@ -23,10 +23,10 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    @DisplayName("handleNotFound should return 404 for UserNotFoundException")
+    @DisplayName("handleNotFound should return 404 for NotFoundException")
     void handleNotFound_whenUserNotFoundException_shouldReturnNotFound() {
         String errorMessage = "User with id 99 not found";
-        UserNotFoundException exception = new UserNotFoundException(errorMessage);
+        NotFoundException exception = new NotFoundException(errorMessage);
         int expectedStatus = 404;
 
         ResponseEntity<ErrorMessage> response = globalExceptionHandler.handleNotFound(exception);
@@ -39,10 +39,10 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    @DisplayName("handleNotFound should return 404 for ItemNotFoundException")
+    @DisplayName("handleNotFound should return 404 for NotFoundException")
     void handleNotFound_whenItemNotFoundException_shouldReturnNotFound() {
         String errorMessage = "Item with id 99 not found";
-        ItemNotFoundException exception = new ItemNotFoundException(errorMessage);
+        NotFoundException exception = new NotFoundException(errorMessage);
         int expectedStatus = 404;
 
         ResponseEntity<ErrorMessage> response = globalExceptionHandler.handleNotFound(exception);
@@ -55,10 +55,10 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    @DisplayName("handleNotFound should return 404 for BookingNotFoundException")
+    @DisplayName("handleNotFound should return 404 for NotFoundException")
     void handleNotFound_whenBookingNotFoundException_shouldReturnNotFound() {
         String errorMessage = "Booking with id 99 not found";
-        BookingNotFoundException exception = new BookingNotFoundException(errorMessage);
+        NotFoundException exception = new NotFoundException(errorMessage);
         int expectedStatus = 404;
 
         ResponseEntity<ErrorMessage> response = globalExceptionHandler.handleNotFound(exception);

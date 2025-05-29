@@ -48,9 +48,8 @@ import ru.practicum.shareit.common.dto.item.UpdateItemDto;
 import ru.practicum.shareit.server.booking.BookingRepository;
 import ru.practicum.shareit.server.exception.AccessDeniedException;
 import ru.practicum.shareit.server.exception.BookingBadRequestException;
-import ru.practicum.shareit.server.exception.ItemNotFoundException;
 import ru.practicum.shareit.server.exception.ItemRequestNotFoundException;
-import ru.practicum.shareit.server.exception.UserNotFoundException;
+import ru.practicum.shareit.server.exception.NotFoundException;
 import ru.practicum.shareit.server.item.mapper.CommentMapper;
 import ru.practicum.shareit.server.item.mapper.ItemMapper;
 import ru.practicum.shareit.server.request.ItemRequest;
@@ -349,13 +348,13 @@ class ItemServiceImplTest {
 
 
         @Test
-        @DisplayName("should throw UserNotFoundException when owner not found")
+        @DisplayName("should throw NotFoundException when owner not found")
         void saveItem_whenUserNotFound_shouldThrowUserNotFoundException() {
             when(userRepository.findById(ownerUserId)).thenReturn(Optional.empty());
 
-            assertThrows(UserNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> itemService.saveItem(newItemDto, ownerUserId),
-                    "Saving item when owner user is not found should throw UserNotFoundException");
+                    "Saving item when owner user is not found should throw NotFoundException");
 
             verify(userRepository).findById(ownerUserId);
             verify(itemMapper, never()).mapToItem(any());
@@ -385,12 +384,12 @@ class ItemServiceImplTest {
         }
 
         @Test
-        @DisplayName("should throw ItemNotFoundException when item not found")
+        @DisplayName("should throw NotFoundException when item not found")
         void getItemById_whenNotFound_shouldThrowItemNotFoundException() {
             when(itemRepository.findById(item1Id)).thenReturn(Optional.empty());
 
-            assertThrows(ItemNotFoundException.class, () -> itemService.getItemById(item1Id),
-                    "Getting item by ID when item is not found should throw ItemNotFoundException");
+            assertThrows(NotFoundException.class, () -> itemService.getItemById(item1Id),
+                    "Getting item by ID when item is not found should throw NotFoundException");
 
             verify(itemRepository).findById(item1Id);
             verify(itemMapper, never()).mapToDto(any());
@@ -445,13 +444,13 @@ class ItemServiceImplTest {
         }
 
         @Test
-        @DisplayName("should throw ItemNotFoundException when item not found")
+        @DisplayName("should throw NotFoundException when item not found")
         void update_whenItemNotFound_shouldThrowItemNotFoundException() {
             when(itemRepository.findById(item1Id)).thenReturn(Optional.empty());
 
-            assertThrows(ItemNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> itemService.update(updateItemDto, ownerUserId, item1Id),
-                    "Updating non-existent item should throw ItemNotFoundException");
+                    "Updating non-existent item should throw NotFoundException");
 
             verify(itemRepository).findById(item1Id);
             verify(itemMapper, never()).updateItemFields(any(), any());
@@ -516,13 +515,13 @@ class ItemServiceImplTest {
         }
 
         @Test
-        @DisplayName("should throw UserNotFoundException when user not found")
+        @DisplayName("should throw NotFoundException when user not found")
         void getItemsByUserId_whenUserNotFound_shouldThrowUserNotFoundException() {
             when(userRepository.findById(ownerUserId)).thenReturn(Optional.empty());
 
-            assertThrows(UserNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> itemService.getItemsByUserId(ownerUserId),
-                    "Getting items when user is not found should throw UserNotFoundException");
+                    "Getting items when user is not found should throw NotFoundException");
 
             verify(userRepository).findById(ownerUserId);
             verify(itemRepository, never()).findByOwnerId(anyLong());
@@ -549,13 +548,13 @@ class ItemServiceImplTest {
         }
 
         @Test
-        @DisplayName("should throw UserNotFoundException when user not found")
+        @DisplayName("should throw NotFoundException when user not found")
         void delete_whenUserNotFound_shouldThrowUserNotFoundException() {
             when(userRepository.findById(ownerUserId)).thenReturn(Optional.empty());
 
-            assertThrows(UserNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> itemService.delete(item1Id, ownerUserId),
-                    "Deleting item when user is not found should throw UserNotFoundException");
+                    "Deleting item when user is not found should throw NotFoundException");
 
             verify(userRepository).findById(ownerUserId);
             verify(itemRepository, never()).findById(anyLong());
@@ -563,14 +562,14 @@ class ItemServiceImplTest {
         }
 
         @Test
-        @DisplayName("should throw ItemNotFoundException when item not found")
+        @DisplayName("should throw NotFoundException when item not found")
         void delete_whenItemNotFound_shouldThrowItemNotFoundException() {
             when(userRepository.findById(ownerUserId)).thenReturn(Optional.of(ownerUser));
             when(itemRepository.findById(item1Id)).thenReturn(Optional.empty());
 
-            assertThrows(ItemNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> itemService.delete(item1Id, ownerUserId),
-                    "Deleting non-existent item should throw ItemNotFoundException");
+                    "Deleting non-existent item should throw NotFoundException");
 
             verify(userRepository).findById(ownerUserId);
             verify(itemRepository).findById(item1Id);
@@ -654,14 +653,14 @@ class ItemServiceImplTest {
         }
 
         @Test
-        @DisplayName("should throw UserNotFoundException when user not found")
+        @DisplayName("should throw NotFoundException when user not found")
         void searchItems_whenUserNotFound_shouldThrowUserNotFoundException() {
             String query = "test";
             when(userRepository.findById(otherUserId)).thenReturn(Optional.empty());
 
-            assertThrows(UserNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> itemService.searchItems(query, otherUserId),
-                    "Searching items when user is not found should throw UserNotFoundException");
+                    "Searching items when user is not found should throw NotFoundException");
 
             verify(userRepository).findById(otherUserId);
             verify(itemRepository, never()).search(anyString());
@@ -720,13 +719,13 @@ class ItemServiceImplTest {
         }
 
         @Test
-        @DisplayName("should throw UserNotFoundException when user not found")
+        @DisplayName("should throw NotFoundException when user not found")
         void saveComment_whenUserNotFound_shouldThrowUserNotFoundException() {
             when(userRepository.findById(otherUserId)).thenReturn(Optional.empty());
 
-            assertThrows(UserNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> itemService.saveComment(newCommentDto, item1Id, otherUserId),
-                    "Saving comment when user is not found should throw UserNotFoundException");
+                    "Saving comment when user is not found should throw NotFoundException");
 
             verify(userRepository).findById(otherUserId);
             verifyNoInteractions(itemRepository, bookingRepository, commentRepository,
@@ -734,14 +733,14 @@ class ItemServiceImplTest {
         }
 
         @Test
-        @DisplayName("should throw ItemNotFoundException when item not found")
+        @DisplayName("should throw NotFoundException when item not found")
         void saveComment_whenItemNotFound_shouldThrowItemNotFoundException() {
             when(userRepository.findById(otherUserId)).thenReturn(Optional.of(otherUser));
             when(itemRepository.findById(item1Id)).thenReturn(Optional.empty());
 
-            assertThrows(ItemNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> itemService.saveComment(newCommentDto, item1Id, otherUserId),
-                    "Saving comment for non-existent item should throw ItemNotFoundException");
+                    "Saving comment for non-existent item should throw NotFoundException");
 
             verify(userRepository).findById(otherUserId);
             verify(itemRepository).findById(item1Id);
@@ -900,27 +899,27 @@ class ItemServiceImplTest {
         }
 
         @Test
-        @DisplayName("should throw UserNotFoundException when user requesting info not found")
+        @DisplayName("should throw NotFoundException when user requesting info not found")
         void getItemByIdWithBookingInfo_whenUserNotFound_shouldThrowUserNotFoundException() {
             when(userRepository.findById(ownerUserId)).thenReturn(Optional.empty());
 
-            assertThrows(UserNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> itemService.getItemByIdWithBookingInfo(item1Id, ownerUserId),
-                    "Getting item info when user is not found should throw UserNotFoundException");
+                    "Getting item info when user is not found should throw NotFoundException");
 
             verify(userRepository).findById(ownerUserId);
             verifyNoInteractions(itemRepository, itemMapper, bookingRepository);
         }
 
         @Test
-        @DisplayName("should throw ItemNotFoundException when item not found")
+        @DisplayName("should throw NotFoundException when item not found")
         void getItemByIdWithBookingInfo_whenItemNotFound_shouldThrowItemNotFoundException() {
             when(userRepository.findById(ownerUserId)).thenReturn(Optional.of(ownerUser));
             when(itemRepository.findById(item1Id)).thenReturn(Optional.empty());
 
-            assertThrows(ItemNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> itemService.getItemByIdWithBookingInfo(item1Id, ownerUserId),
-                    "Getting info for non-existent item should throw ItemNotFoundException");
+                    "Getting info for non-existent item should throw NotFoundException");
 
             verify(userRepository).findById(ownerUserId);
             verify(itemRepository).findById(item1Id);
@@ -1000,13 +999,13 @@ class ItemServiceImplTest {
         }
 
         @Test
-        @DisplayName("should throw UserNotFoundException when user not found")
+        @DisplayName("should throw NotFoundException when user not found")
         void getAllItemsByOwner_whenUserNotFound_shouldThrowUserNotFoundException() {
             when(userRepository.findById(ownerUserId)).thenReturn(Optional.empty());
 
-            assertThrows(UserNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> itemService.getAllItemsByOwnerWithBookingInfo(ownerUserId),
-                    "Getting all items for non-existent user should throw UserNotFoundException");
+                    "Getting all items for non-existent user should throw NotFoundException");
 
             verify(userRepository).findById(ownerUserId);
             verifyNoInteractions(itemRepository, itemMapper, bookingRepository);

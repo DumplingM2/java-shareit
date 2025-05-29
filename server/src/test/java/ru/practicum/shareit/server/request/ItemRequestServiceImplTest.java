@@ -43,7 +43,7 @@ import ru.practicum.shareit.common.dto.item.ItemShortDto;
 import ru.practicum.shareit.common.dto.request.ItemRequestDto;
 import ru.practicum.shareit.common.dto.request.NewItemRequestDto;
 import ru.practicum.shareit.server.exception.ItemRequestNotFoundException;
-import ru.practicum.shareit.server.exception.UserNotFoundException;
+import ru.practicum.shareit.server.exception.NotFoundException;
 import ru.practicum.shareit.server.item.Item;
 import ru.practicum.shareit.server.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.server.user.User;
@@ -186,12 +186,12 @@ class ItemRequestServiceImplTest {
         }
 
         @Test
-        @DisplayName("should throw UserNotFoundException when user does not exist")
+        @DisplayName("should throw NotFoundException when user does not exist")
         void addRequest_whenUserNotFound_shouldThrowUserNotFoundException() {
             when(userRepository.findById(nonExistentUserId)).thenReturn(Optional.empty());
-            assertThrows(UserNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> itemRequestService.addRequest(newItemRequestDto, nonExistentUserId),
-                    "Adding request when user is not found should throw UserNotFoundException");
+                    "Adding request when user is not found should throw NotFoundException");
 
             verify(userRepository).findById(nonExistentUserId);
             verifyNoInteractions(itemRequestMapper, itemRequestRepository);
@@ -243,12 +243,12 @@ class ItemRequestServiceImplTest {
         }
 
         @Test
-        @DisplayName("should throw UserNotFoundException when user does not exist")
+        @DisplayName("should throw NotFoundException when user does not exist")
         void getOwnRequests_whenUserNotFound_shouldThrowUserNotFoundException() {
             when(userRepository.findById(nonExistentUserId)).thenReturn(Optional.empty());
-            assertThrows(UserNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> itemRequestService.getOwnRequests(nonExistentUserId),
-                    "Getting own requests when user is not found should throw UserNotFoundException");
+                    "Getting own requests when user is not found should throw NotFoundException");
 
             verify(userRepository).findById(nonExistentUserId);
             verifyNoInteractions(itemRequestRepository, itemRequestMapper);
@@ -364,12 +364,12 @@ class ItemRequestServiceImplTest {
         }
 
         @Test
-        @DisplayName("should throw UserNotFoundException when user does not exist")
+        @DisplayName("should throw NotFoundException when user does not exist")
         void getAllRequests_whenUserNotFound_shouldThrowUserNotFoundException() {
             when(userRepository.findById(nonExistentUserId)).thenReturn(Optional.empty());
-            assertThrows(UserNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> itemRequestService.getAllRequests(nonExistentUserId, 0, 10),
-                    "Getting all requests when user is not found should throw UserNotFoundException");
+                    "Getting all requests when user is not found should throw NotFoundException");
 
             verify(userRepository).findById(nonExistentUserId);
             verifyNoInteractions(itemRequestRepository, itemRequestMapper);
@@ -400,12 +400,12 @@ class ItemRequestServiceImplTest {
         }
 
         @Test
-        @DisplayName("should throw UserNotFoundException when user does not exist")
+        @DisplayName("should throw NotFoundException when user does not exist")
         void getRequestById_whenUserNotFound_shouldThrowUserNotFoundException() {
             when(userRepository.findById(nonExistentUserId)).thenReturn(Optional.empty());
-            assertThrows(UserNotFoundException.class,
+            assertThrows(NotFoundException.class,
                     () -> itemRequestService.getRequestById(request1Id, nonExistentUserId),
-                    "Getting request by ID when user is not found should throw UserNotFoundException");
+                    "Getting request by ID when user is not found should throw NotFoundException");
 
             verify(userRepository).findById(nonExistentUserId);
             verifyNoInteractions(itemRequestRepository, itemRequestMapper);

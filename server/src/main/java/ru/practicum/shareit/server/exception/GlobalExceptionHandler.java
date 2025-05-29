@@ -12,8 +12,8 @@ import ru.practicum.shareit.common.exception.ErrorMessage;
 @SuppressWarnings("unused")
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({UserNotFoundException.class, ItemNotFoundException.class,
-            BookingNotFoundException.class, ItemRequestNotFoundException.class})
+    @ExceptionHandler({NotFoundException.class, NotFoundException.class,
+            NotFoundException.class, ItemRequestNotFoundException.class})
     public ResponseEntity<ErrorMessage> handleNotFound(final RuntimeException e) {
         log.warn("Encountered {} while processing request: returning 404 Not Found",
                 e.getClass().getSimpleName());

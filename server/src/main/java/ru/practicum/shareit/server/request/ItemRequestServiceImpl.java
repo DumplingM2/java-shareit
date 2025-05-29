@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.common.dto.request.ItemRequestDto;
 import ru.practicum.shareit.common.dto.request.NewItemRequestDto;
 import ru.practicum.shareit.server.exception.ItemRequestNotFoundException;
-import ru.practicum.shareit.server.exception.UserNotFoundException;
+import ru.practicum.shareit.server.exception.NotFoundException;
 import ru.practicum.shareit.server.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.server.user.User;
 import ru.practicum.shareit.server.user.UserRepository;
@@ -90,7 +90,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private User findUserOrThrow(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> {
             log.warn("User with id {} not found", userId);
-            return new UserNotFoundException("User with id " + userId + " not found");
+            return new NotFoundException("User with id " + userId + " not found");
         });
     }
 

@@ -38,8 +38,7 @@ import ru.practicum.shareit.common.dto.item.NewCommentDto;
 import ru.practicum.shareit.common.dto.item.NewItemDto;
 import ru.practicum.shareit.common.dto.item.UpdateItemDto;
 import ru.practicum.shareit.server.exception.AccessDeniedException;
-import ru.practicum.shareit.server.exception.ItemNotFoundException;
-import ru.practicum.shareit.server.exception.UserNotFoundException;
+import ru.practicum.shareit.server.exception.NotFoundException;
 
 @WebMvcTest(ItemController.class)
 @DisplayName("Item Controller WebMvc Tests")
@@ -124,7 +123,7 @@ class ItemControllerTest {
     void getUserItems_whenUserNotFound_shouldReturnNotFound() throws Exception {
         String errorMsg = "User not found";
         when(itemService.getAllItemsByOwnerWithBookingInfo(nonExistentItemId)).thenThrow(
-                new UserNotFoundException(errorMsg));
+                new NotFoundException(errorMsg));
 
         mockMvc.perform(get("/items").header(userIdHeaderName,
                         nonExistentItemId))
@@ -155,7 +154,7 @@ class ItemControllerTest {
     void getById_whenItemNotFound_shouldReturnNotFound() throws Exception {
         String errorMsg = "Item not found";
         when(itemService.getItemByIdWithBookingInfo(nonExistentItemId, ownerUserId)).thenThrow(
-                new ItemNotFoundException(errorMsg));
+                new NotFoundException(errorMsg));
 
         mockMvc.perform(get("/items/{id}", nonExistentItemId).header(userIdHeaderName, ownerUserId))
                 .andExpect(status().isNotFound())
@@ -171,7 +170,7 @@ class ItemControllerTest {
     void getById_whenUserNotFound_shouldReturnNotFound() throws Exception {
         String errorMsg = "Requesting user not found";
         when(itemService.getItemByIdWithBookingInfo(item1Id, nonExistentItemId)).thenThrow(
-                new UserNotFoundException(errorMsg));
+                new NotFoundException(errorMsg));
 
         mockMvc.perform(get("/items/{id}", item1Id).header(userIdHeaderName,
                         nonExistentItemId))
@@ -204,7 +203,7 @@ class ItemControllerTest {
     void saveItem_whenOwnerNotFound_shouldReturnNotFound() throws Exception {
         String errorMsg = "Owner user not found";
         when(itemService.saveItem(any(NewItemDto.class), eq(nonExistentItemId))).thenThrow(
-                new UserNotFoundException(errorMsg));
+                new NotFoundException(errorMsg));
 
         mockMvc.perform(post("/items").header(userIdHeaderName, nonExistentItemId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -240,7 +239,7 @@ class ItemControllerTest {
     void update_whenItemNotFound_shouldReturnNotFound() throws Exception {
         String errorMsg = "Item to update not found";
         when(itemService.update(any(UpdateItemDto.class), eq(ownerUserId),
-                eq(nonExistentItemId))).thenThrow(new ItemNotFoundException(errorMsg));
+                eq(nonExistentItemId))).thenThrow(new NotFoundException(errorMsg));
 
         mockMvc.perform(
                         patch("/items/{id}", nonExistentItemId).header(userIdHeaderName, ownerUserId)
@@ -309,7 +308,7 @@ class ItemControllerTest {
         String query = "search text";
         String errorMsg = "Search user not found";
         when(itemService.searchItems(anyString(), eq(nonExistentItemId))).thenThrow(
-                new UserNotFoundException(errorMsg));
+                new NotFoundException(errorMsg));
 
         mockMvc.perform(
                         get("/items/search").header(userIdHeaderName, nonExistentItemId).param("text",
@@ -337,7 +336,7 @@ class ItemControllerTest {
     @DisplayName("DELETE /items/{id} - Failure (Item Not Found)")
     void delete_whenItemNotFound_shouldReturnNotFound() throws Exception {
         String errorMsg = "Item to delete not found";
-        doThrow(new ItemNotFoundException(errorMsg)).when(itemService)
+        doThrow(new NotFoundException(errorMsg)).when(itemService)
                 .delete(eq(nonExistentItemId), eq(ownerUserId));
 
         mockMvc.perform(
@@ -391,7 +390,7 @@ class ItemControllerTest {
     void saveComment_whenItemNotFound_shouldReturnNotFound() throws Exception {
         String errorMsg = "Item to comment on not found";
         when(itemService.saveComment(any(NewCommentDto.class), eq(nonExistentItemId),
-                eq(otherUserId))).thenThrow(new ItemNotFoundException(errorMsg));
+                eq(otherUserId))).thenThrow(new NotFoundException(errorMsg));
 
         mockMvc.perform(
                         post("/items/{itemId}/comment", nonExistentItemId).header(userIdHeaderName,
@@ -412,7 +411,7 @@ class ItemControllerTest {
     void saveComment_whenUserNotFound_shouldReturnNotFound() throws Exception {
         String errorMsg = "Commenting user not found";
         when(itemService.saveComment(any(NewCommentDto.class), eq(item1Id),
-                eq(nonExistentItemId))).thenThrow(new UserNotFoundException(errorMsg));
+                eq(nonExistentItemId))).thenThrow(new NotFoundException(errorMsg));
 
         mockMvc.perform(post("/items/{itemId}/comment", item1Id).header(userIdHeaderName,
                                 nonExistentItemId)

@@ -32,11 +32,7 @@ import ru.practicum.shareit.common.dto.booking.BookingDto;
 import ru.practicum.shareit.common.dto.booking.NewBookingDto;
 import ru.practicum.shareit.common.enums.BookingState;
 import ru.practicum.shareit.common.enums.BookingStatus;
-import ru.practicum.shareit.server.exception.AccessDeniedException;
-import ru.practicum.shareit.server.exception.BookingBadRequestException;
-import ru.practicum.shareit.server.exception.BookingNotFoundException;
-import ru.practicum.shareit.server.exception.ItemNotFoundException;
-import ru.practicum.shareit.server.exception.UserNotFoundException;
+import ru.practicum.shareit.server.exception.*;
 
 @WebMvcTest(BookingController.class)
 @DisplayName("Booking Controller WebMvc Tests")
@@ -102,7 +98,7 @@ class BookingControllerTest {
     void saveBooking_whenBookerNotFound_shouldReturnNotFound() throws Exception {
         String errorMsg = "Booker not found";
         when(bookingService.saveBooking(any(NewBookingDto.class), eq(otherUserId)))
-                .thenThrow(new UserNotFoundException(errorMsg));
+                .thenThrow(new NotFoundException(errorMsg));
 
         mockMvc.perform(post("/bookings")
                         .header(userIdHeaderName, otherUserId)
@@ -121,7 +117,7 @@ class BookingControllerTest {
     void saveBooking_whenItemNotFound_shouldReturnNotFound() throws Exception {
         String errorMsg = "Item not found";
         when(bookingService.saveBooking(any(NewBookingDto.class), eq(bookerId)))
-                .thenThrow(new ItemNotFoundException(errorMsg));
+                .thenThrow(new NotFoundException(errorMsg));
 
         mockMvc.perform(post("/bookings")
                         .header(userIdHeaderName, bookerId)
@@ -197,7 +193,7 @@ class BookingControllerTest {
     void approveBooking_whenBookingNotFound_shouldReturnNotFound() throws Exception {
         String errorMsg = "Booking not found";
         when(bookingService.approveBooking(eq(nonExistentBookingId), eq(ownerId), eq(true)))
-                .thenThrow(new BookingNotFoundException(errorMsg));
+                .thenThrow(new NotFoundException(errorMsg));
 
         mockMvc.perform(patch("/bookings/{bookingId}", nonExistentBookingId)
                         .header(userIdHeaderName, ownerId)
@@ -261,7 +257,7 @@ class BookingControllerTest {
     void getById_whenBookingNotFound_shouldReturnNotFound() throws Exception {
         String errorMsg = "Booking not found";
         when(bookingService.getById(eq(bookerId), eq(nonExistentBookingId)))
-                .thenThrow(new BookingNotFoundException(errorMsg));
+                .thenThrow(new NotFoundException(errorMsg));
 
         mockMvc.perform(get("/bookings/{bookingId}", nonExistentBookingId)
                         .header(userIdHeaderName, bookerId))
@@ -335,7 +331,7 @@ class BookingControllerTest {
     void getBookingsByBooker_whenUserNotFound_shouldReturnNotFound() throws Exception {
         String errorMsg = "Booker user not found";
         when(bookingService.getBookingsByBooker(eq(nonExistentBookingId), any(BookingState.class),
-                any(), any())).thenThrow(new UserNotFoundException(errorMsg));
+                any(), any())).thenThrow(new NotFoundException(errorMsg));
 
         mockMvc.perform(get("/bookings")
                         .header(userIdHeaderName, nonExistentBookingId))
@@ -371,7 +367,7 @@ class BookingControllerTest {
     void getBookingsByOwner_whenUserNotFound_shouldReturnNotFound() throws Exception {
         String errorMsg = "Owner user not found";
         when(bookingService.getBookingsByOwner(eq(nonExistentBookingId), any(BookingState.class),
-                any(), any())).thenThrow(new UserNotFoundException(errorMsg));
+                any(), any())).thenThrow(new NotFoundException(errorMsg));
 
         mockMvc.perform(get("/bookings/owner")
                         .header(userIdHeaderName, nonExistentBookingId))

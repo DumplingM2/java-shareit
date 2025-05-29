@@ -8,7 +8,7 @@ import ru.practicum.shareit.common.dto.user.NewUserDto;
 import ru.practicum.shareit.common.dto.user.UpdateUserDto;
 import ru.practicum.shareit.common.dto.user.UserDto;
 import ru.practicum.shareit.server.exception.EmailAlreadyExistsException;
-import ru.practicum.shareit.server.exception.UserNotFoundException;
+import ru.practicum.shareit.server.exception.NotFoundException;
 import ru.practicum.shareit.server.user.mapper.UserMapper;
 
 @Service
@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
     public UserDto getById(Long id) {
         return userMapper.mapToDto(userRepository.findById(id).orElseThrow(() -> {
             log.warn("User with id {} not found", id);
-            return new UserNotFoundException("User with id " + id + " not found");
+            return new NotFoundException("User with id " + id + " not found");
         }));
     }
 
@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
     public UserDto update(UpdateUserDto updatedUserDto, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> {
             log.warn("User with id {} not found for update", userId);
-            return new UserNotFoundException("User with id " + userId + " not found");
+            return new NotFoundException("User with id " + userId + " not found");
         });
         if (updatedUserDto.getEmail() != null && !updatedUserDto.getEmail().equals(user.getEmail())
                 && userRepository.existsByEmail(updatedUserDto.getEmail())) {
