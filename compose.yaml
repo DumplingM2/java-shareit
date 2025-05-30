@@ -1,0 +1,38 @@
+services:
+  server:
+    build: server
+    container_name: shareit-server-compose
+    ports:
+      - "9090:9090"
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit_db
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
+      - JAVA_OPTS=-Duser.timezone=UTC
+
+  gateway:
+    build: gateway
+    container_name: shareit-gateway-compose
+    ports:
+      - "8080:8080"
+    depends_on:
+      - server
+
+  db:
+    image: postgres:16
+    container_name: shareit-db-compose
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: shareit_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+    driver: local
